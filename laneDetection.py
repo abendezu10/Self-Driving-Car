@@ -23,12 +23,16 @@ def detect_lanes(edges):
     masked_edges = cv2.bitwise_and(edges, mask)
     
     # Detect lines using Hough Transform
-    lines = cv2.HoughLinesP(masked_edges, 1, np.pi/180, 30, maxLineGap=200)
+    lines = cv2.HoughLinesP(masked_edges, 1, np.pi/180, 60, maxLineGap=150)
     return lines
 
 def draw_lane_boxes(frame, lines):
     if lines is None:
-        return frame
+        return frame, 'N/A', 'N/A'
+    
+    height, width = frame.shape[:2]
+    center_x = width // 2
+
 
     left_lines = []
     right_lines = []
@@ -50,6 +54,12 @@ def draw_lane_boxes(frame, lines):
         else:
             right_lines.append(line)
 
+    #Draw center line
+    cv2.line(frame, (center_x, height), (center_x, height//2), (0, 255, 255), 2)
+
+    #Initialize distance variables
+    left_dist = right_dist = 'N/A'
+
     # Draw bounding boxes for left and right lanes
     if left_lines:
         left_x = int(min(min(line[0][0], line[0][2]) for line in left_lines))
@@ -59,6 +69,9 @@ def draw_lane_boxes(frame, lines):
         cv2.rectangle(frame, (left_x, top_y), (right_x, bottom_y), (0, 255, 0), 2)
         cv2.putText(frame, "Left Lane", (left_x, top_y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
+        # Calculate the distance of the left lane from the center
+        left_dist = center_x - right_x
+
     if right_lines:
         left_x = int(min(min(line[0][0], line[0][2]) for line in right_lines))
         right_x = int(max(max(line[0][0], line[0][2]) for line in right_lines))
@@ -67,7 +80,15 @@ def draw_lane_boxes(frame, lines):
         cv2.rectangle(frame, (left_x, top_y), (right_x, bottom_y), (0, 0, 255), 2)
         cv2.putText(frame, "Right Lane", (left_x, top_y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
-    return frame
+        # Calculate the distance of the right lane from the center
+        right_dist = left_x - center_x
+
+    
+
+    cv2.putText(frame, f"Left Distance: {left_dist}", (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+    cv2.putText(frame, f"Right Distance: {right_dist}", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+
+    return frame, left_dist, right_dist
 
 # Initialize the camera
 cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)  # Use 0 for Raspberry Pi
@@ -82,7 +103,7 @@ while True:
 
     edges = canny_edge_detection(frame)
     lines = detect_lanes(edges)
-    frame_with_boxes = draw_lane_boxes(frame.copy(), lines)
+    frame_with_boxes, left_dist, right_dist = draw_lane_boxes(frame.copy(), lines)
 
     cv2.imshow('Lane Detection', frame_with_boxes)
     cv2.imshow('Edges', edges)
