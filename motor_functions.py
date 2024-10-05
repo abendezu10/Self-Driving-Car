@@ -3,12 +3,14 @@ import time
 
 # L298N Driver 1 for front wheels
 
-input1 = 17
-input2 = 22
-input3 = 23
-input4 = 24
-enableA1 = 12
-enableB1 = 13
+input1 = 17 # white wire
+input2 = 22 # brown wire
+input3 = 23 # organge wite
+input4 = 24 # red wire
+enableA1 = 12 # white wire (on oppsite side of GPIO PIN 17)
+enableB1 = 13 # blue wire
+
+# yellow wire is connected to GND on L298n
 
 pwm_enA1 = None
 pwm_enB1 = None
