@@ -9,10 +9,14 @@ input4 = 24
 enableA = 12
 enableB = 13
 
+pwm_enA = None
+pwm_enB = None
 
 # Initializes all GPIO Pins
 
 def init():
+
+    global pwm_enA,pwm_enB
 
     GPIO.setmode(GPIO.BCM)
 
@@ -59,8 +63,23 @@ def forward():
     pwm_enB.ChangeDutyCycle(75)
     
 
-#def slow_forward():
+def slow_forward():
+
+    GPIO.output(input1, GPIO.HIGH)
+
+    GPIO.output(input2, GPIO.LOW)
+
+    GPIO.output(input3, GPIO.HIGH)
+
+    GPIO.output(input4, GPIO.LOW)
     
+    pwm_enA.ChangeDutyCycle(25)
+
+    pwm_enB.ChangeDutyCycle(25)
+
+#def right_turn(): perhaps 3 different version of right turning to make up for lack of servo 15 deg, 30 deg., 45.
+
+#def left_turn(): perhaps 3 different versio of left turnign to make up for lack of servo 15 deg., 30 deg., 45 deg.
 
 
 
@@ -79,3 +98,30 @@ def stop():
     pwm_enA.ChangeDutyCycle(0)
 
     pwm_enB.ChangeDutyCycle(0)
+
+def quit():
+
+    GPIO.output(input1, GPIO.LOW)
+
+    GPIO.output(input2, GPIO.LOW)
+
+    GPIO.output(input3, GPIO.LOW)
+
+    GPIO.output(input4, GPIO.LOW)
+
+    pwm_enA.ChangeDutyCycle(0)
+
+    pwm_enB.ChangeDutyCycle(0)
+
+    pwm_enA.stop()
+
+    pwm_enB.stop()
+
+    GPIO.cleanup
+
+
+# Optional if we have time:
+
+# def speed_up()
+# def reverse()
+# def drift() if possible
