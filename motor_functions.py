@@ -1,22 +1,35 @@
 import RPio.GPIO as GPIO
 import time
 
+# L298N Driver 1 for front wheels
 
 input1 = 17
 input2 = 22
 input3 = 23
 input4 = 24
-enableA = 12
-enableB = 13
+enableA1 = 12
+enableB1 = 13
 
-pwm_enA = None
-pwm_enB = None
+pwm_enA1 = None
+pwm_enB1 = None
+
+# L298 Driver 2 for back wheels
+
+#input5 = 4
+#input6 = 5
+#input7 = 10
+#input8 = 16
+#enableA2 = 14
+#enableB2 =  6
+
+#pwm_enA2 = None
+#pwm_enB2 = None
 
 # Initializes all GPIO Pins
 
 def init():
 
-    global pwm_enA,pwm_enB
+    global pwm_left,pwm_right
 
     GPIO.setmode(GPIO.BCM)
 
@@ -33,17 +46,43 @@ def init():
     GPIO.setup(input4, GPIO.OUT)
 
     # Controls speed and torque of motor
-    enableA = 12 
-    GPIO.setup(enableA, GPIO.OUT)
+    enableA1 = 12 
+    GPIO.setup(enableA1, GPIO.OUT)
 
-    enableB = 13
-    GPIO.setup(enableB, GPIO.OUT) 
+    enableB1 = 13
+    GPIO.setup(enableB2, GPIO.OUT) 
+
+
+    pwm_left = GPIO.PWM(enableA1, 1000) # left side motor
+    pwm_left.start(0)
+
+    pwm_right = GPIO.PWM(enableB1, 1000) # right side motor
+    pwm_right.start(0)
     
-    pwm_enA = GPIO.PWM(enableA, 1000) 
-    pwm_enA.start(0)
+     # GPIO PIN 4
+    #GPIO.setup(input5, GPIO.OUT)
 
-    pwm_enB = GPIO.PWM(enableA, 1000)
-    pwm_enB.start(0)
+    # GPIO PIN 5
+    #GPIO.setup(input6, GPIO.OUT)
+
+    # GPIO PIN 10
+    #GPIO.setup(input7, GPIO.OUT)
+
+    # GPIO PIN 16
+    #GPIO.setup(input8, GPIO.OUT)
+
+    # Controls speed and torque of motor
+    #enableA2 = 14
+    #GPIO.setup(enableA, GPIO.OUT)
+
+    #enableB2 = 6
+    #GPIO.setup(enableB2, GPIO.OUT) 
+    
+    #pwm_enA2 = GPIO.PWM(enableA2, 1000) 
+    #pwm_enA2.start(0)
+
+    #pwm_enB2 = GPIO.PWM(enableA2, 1000)
+    #pwm_enB2.start(0)
 
 
 def forward():
@@ -58,9 +97,9 @@ def forward():
 
     GPIO.output(input4, GPIO.LOW)
     
-    pwm_enA.ChangeDutyCycle(75)
+    pwm_enA1.ChangeDutyCycle(75)
 
-    pwm_enB.ChangeDutyCycle(75)
+    pwm_enB1.ChangeDutyCycle(75)
     
 
 def slow_forward():
@@ -73,15 +112,54 @@ def slow_forward():
 
     GPIO.output(input4, GPIO.LOW)
     
-    pwm_enA.ChangeDutyCycle(25)
+    pwm_left.ChangeDutyCycle(25)
 
-    pwm_enB.ChangeDutyCycle(25)
+    pwm_right.ChangeDutyCycle(25)
 
-#def right_turn(): perhaps 3 different version of right turning to make up for lack of servo 15 deg, 30 deg., 45.
+def right_turn_15(): 
 
-#def left_turn(): perhaps 3 different versio of left turnign to make up for lack of servo 15 deg., 30 deg., 45 deg.
+    # needs testing
+    
+    pwm_left.ChangeDutyCycle(35)
+    pwm_right.ChangeDutyCycle(50)
+    time.sleep(0.25)
+    forward()
 
 
+def right_turn_30():
+
+    pwm_left.ChangeDutyCycle(35)
+    pwm_right.ChangeDutyCycle(50)
+    time.sleep(0.5)
+    forward()
+
+def right_turn_45():
+
+    pwm_left.ChangeDutyCycle(35)
+    pwm_right.ChangeDutyCycle(50)
+    time.sleep(1)
+    forward()
+
+def left_turn_15():
+
+    pwm_left.ChangeDutyCycle(50)
+    pwm_right.ChangeDutyCycle(35)
+    time.sleep(0.25)
+    forward()
+
+def left_turn_30():
+
+    pwm_left.ChangeDutyCycle(50)
+    pwm_right.ChangeDutyCycle(35)
+    time.sleep(0.50)
+    forward()
+
+def left_turn_45():
+
+    pwm_left.ChangeDutyCycle(50)
+    pwm_right.ChangeDutyCycle(35)
+    time.sleep(1)
+    forward()
 
 def stop():
     
@@ -95,9 +173,9 @@ def stop():
 
     GPIO.output(input4, GPIO.LOW)
     
-    pwm_enA.ChangeDutyCycle(0)
+    pwm_left.ChangeDutyCycle(0)
 
-    pwm_enB.ChangeDutyCycle(0)
+    pwm_right.ChangeDutyCycle(0)
 
 def quit():
 
@@ -109,13 +187,13 @@ def quit():
 
     GPIO.output(input4, GPIO.LOW)
 
-    pwm_enA.ChangeDutyCycle(0)
+    pwm_left.ChangeDutyCycle(0)
 
-    pwm_enB.ChangeDutyCycle(0)
+    pwm_right.ChangeDutyCycle(0)
 
-    pwm_enA.stop()
+    pwm_left.stop()
 
-    pwm_enB.stop()
+    pwm_right.stop()
 
     GPIO.cleanup
 
