@@ -52,8 +52,6 @@ def draw_lane_boxes(frame, lines):
 
     # Draw bounding boxes for left and right lanes
     if left_lines:
-
-
         left_x = int(min(min(line[0][0], line[0][2]) for line in left_lines))
         right_x = int(max(max(line[0][0], line[0][2]) for line in left_lines))
         top_y = int(min(min(line[0][1], line[0][3]) for line in left_lines))
@@ -72,7 +70,7 @@ def draw_lane_boxes(frame, lines):
     return frame
 
 # Initialize the camera
-cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)  # Use 0 for Raspberry Pi
+cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)  # Use 0 for Raspberry Pi
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 480)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 576)
 
