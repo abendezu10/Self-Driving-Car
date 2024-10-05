@@ -1,0 +1,13 @@
+.Title{
+    font: 2em 'Arial';
+    text-align: center;
+}
+
+.Feed{
+    display: flex;
+    justify-content: center;
+}
+
+body{
+    background-color: #ffffff;
+}

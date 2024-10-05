@@ -1,5 +1,25 @@
 import cv2
 import numpy as np
+from flask import Flask, render_template, Response
+from flask_socketio import SocketIO
+import threading
+import base64
+import time
+import platform
+
+# Determine if we're running on a Raspberry Pi
+IS_RASPBERRY_PI = platform.machine().startswith('arm') or platform.machine().startswith('aarch')
+
+# Initialize the camera
+if IS_RASPBERRY_PI:
+    # For Raspberry Pi, we might need to specify the backend
+    cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
+else:
+    # For other platforms, use the default
+    cap = cv2.VideoCapture(0)
+
+app = Flask(__name__)
+socketio = SocketIO(app)
 
 def canny_edge_detection(frame):
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -90,26 +110,37 @@ def draw_lane_boxes(frame, lines):
 
     return frame, left_dist, right_dist
 
-# Initialize the camera
-cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)  # Use 0 for Raspberry Pi
-cap.set(cv2.CAP_PROP_FRAME_WIDTH, 480)
-cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 576)
 
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        print("Error: Could not capture frame.")
-        break
+def generate_frames():
+    cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)  # Use 0 for Raspberry Pi
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 480)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 576)
 
-    edges = canny_edge_detection(frame)
-    lines = detect_lanes(edges)
-    frame_with_boxes, left_dist, right_dist = draw_lane_boxes(frame.copy(), lines)
+    while True:
+        ret, frame = cap.read()
+        #time.sleep(.5)
+        if not ret:
+            break
 
-    cv2.imshow('Lane Detection', frame_with_boxes)
-    cv2.imshow('Edges', edges)
+        edges = canny_edge_detection(frame)
+        lines = detect_lanes(edges)
+        frame_with_boxes, left_dist, right_dist = draw_lane_boxes(frame.copy(), lines)
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+        #_, buffer = cv2.imencode('.jpg', frame_with_boxes)
+        _, buffer = cv2.imencode('.jpg', frame_with_boxes)
+        frame_bytes = buffer.tobytes()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
 
-cap.release()
-cv2.destroyAllWindows()
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/video_feed')
+def video_feed():
+    return Response(generate_frames(),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
+if __name__ == '__main__':
+    socketio.run(app, host='0.0.0.0', port=5000, debug=True)
+

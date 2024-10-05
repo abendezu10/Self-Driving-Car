@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Feed</title>
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/index.css') }}">
+</head>
+<body>
+    <div class="">
+        <div class="Title">
+            <h1>Live Feed</h1>
+        </div>
+        <div class="Feed">
+            <img src="{{ url_for('video_feed') }}">
+        </div>
+    </div>
+</body>
+</html>
