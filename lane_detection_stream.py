@@ -6,6 +6,7 @@ import threading
 import base64
 import time
 import platform
+from globals import left_dist, right_dist
 
 # Determine if we're running on a Raspberry Pi
 IS_RASPBERRY_PI = platform.machine().startswith('arm') or platform.machine().startswith('aarch')
@@ -15,8 +16,9 @@ if IS_RASPBERRY_PI:
     # For Raspberry Pi, we might need to specify the backend
     cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
 else:
-    # For other platforms, use the default
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
+
+
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -48,8 +50,8 @@ def detect_lanes(edges):
 
 def draw_lane_boxes(frame, lines):
     if lines is None:
-        return frame, 'N/A', 'N/A'
-    
+        return frame
+        
     height, width = frame.shape[:2]
     center_x = width // 2
 
@@ -108,33 +110,37 @@ def draw_lane_boxes(frame, lines):
     cv2.putText(frame, f"Left Distance: {left_dist}", (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
     cv2.putText(frame, f"Right Distance: {right_dist}", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
-    return frame, left_dist, right_dist
+    set_distances(left_dist, right_dist)
 
-global left_dist, right_dist
+    return frame
+
 def set_distances(left, right):
+    global left_dist, right_dist
     left_dist, right_dist = left, right
 
 def get_distances():
+
     return left_dist, right_dist
 
-def generate_frames():
-    cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)  # Use 0 for Raspberry Pi
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 480)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 576)
+def process_single_frame():
+    ret, frame = cap.read()
+    if not ret:
+        return None, 'N/A', 'N/A'
+    
+    edges = canny_edge_detection(frame)
+    lines = detect_lanes(edges)
+    frame_with_boxes = draw_lane_boxes(frame.copy(), lines)
+    
+    left, right = get_distances()
+    return frame_with_boxes, left, right
 
+def generate_frames():
     while True:
-        ret, frame = cap.read()
-        #time.sleep(.5)
-        if not ret:
+        frame, left, right = process_single_frame()
+        if frame is None:
             break
 
-        edges = canny_edge_detection(frame)
-        lines = detect_lanes(edges)
-        frame_with_boxes, left_dist, right_dist = draw_lane_boxes(frame.copy(), lines)
-
-        set_distances(left_dist, right_dist)
-
-        _, buffer = cv2.imencode('.jpg', frame_with_boxes)
+        _, buffer = cv2.imencode('.jpg', frame)
         frame_bytes = buffer.tobytes()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
@@ -150,4 +156,3 @@ def video_feed():
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000, debug=True)
-
