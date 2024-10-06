@@ -110,6 +110,12 @@ def draw_lane_boxes(frame, lines):
 
     return frame, left_dist, right_dist
 
+global left_dist, right_dist
+def set_distances(left, right):
+    left_dist, right_dist = left, right
+
+def get_distances():
+    return left_dist, right_dist
 
 def generate_frames():
     cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)  # Use 0 for Raspberry Pi
@@ -126,7 +132,8 @@ def generate_frames():
         lines = detect_lanes(edges)
         frame_with_boxes, left_dist, right_dist = draw_lane_boxes(frame.copy(), lines)
 
-        #_, buffer = cv2.imencode('.jpg', frame_with_boxes)
+        set_distances(left_dist, right_dist)
+
         _, buffer = cv2.imencode('.jpg', frame_with_boxes)
         frame_bytes = buffer.tobytes()
         yield (b'--frame\r\n'
