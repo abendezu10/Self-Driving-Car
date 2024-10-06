@@ -61,32 +61,6 @@ def init():
     pwm_right = GPIO.PWM(enableB1, 1000) # right side motor
     pwm_right.start(0)
     
-     # GPIO PIN 4
-    #GPIO.setup(input5, GPIO.OUT)
-
-    # GPIO PIN 5
-    #GPIO.setup(input6, GPIO.OUT)
-
-    # GPIO PIN 10
-    #GPIO.setup(input7, GPIO.OUT)
-
-    # GPIO PIN 16
-    #GPIO.setup(input8, GPIO.OUT)
-
-    # Controls speed and torque of motor
-    #enableA2 = 14
-    #GPIO.setup(enableA, GPIO.OUT)
-
-    #enableB2 = 6
-    #GPIO.setup(enableB2, GPIO.OUT) 
-    
-    #pwm_enA2 = GPIO.PWM(enableA2, 1000) 
-    #pwm_enA2.start(0)
-
-    #pwm_enB2 = GPIO.PWM(enableA2, 1000)
-    #pwm_enB2.start(0)
-
-
 def forward():
     
     # Forward motion because of H-Bridge component
@@ -99,9 +73,9 @@ def forward():
 
     GPIO.output(input4, GPIO.LOW)
     
-    pwm_enA1.ChangeDutyCycle(75)
+    pwm_enA1.ChangeDutyCycle(100)
 
-    pwm_enB1.ChangeDutyCycle(75)
+    pwm_enB1.ChangeDutyCycle(100)
     
 
 def slow_forward():
@@ -114,9 +88,9 @@ def slow_forward():
 
     GPIO.output(input4, GPIO.LOW)
     
-    pwm_left.ChangeDutyCycle(25)
+    pwm_left.ChangeDutyCycle(50)
 
-    pwm_right.ChangeDutyCycle(25)
+    pwm_right.ChangeDutyCycle(50)
 
 def right_turn_15(): 
 
