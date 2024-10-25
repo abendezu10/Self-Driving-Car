@@ -1,0 +1,12 @@
+total 192
+-rw-rw-r-- 1 abendezu abendezu      0 Oct 25 17:59 pcount.txt
+-rw-rw-r-- 1 abendezu abendezu 196241 Oct 25 17:42 test.jpg
+total 196
+-rw-rw-r-- 1 abendezu abendezu    132 Oct 25 18:00 pcount.txt
+-rw-rw-r-- 1 abendezu abendezu 196241 Oct 25 17:42 test.jpg
+total 196
+-rw-rw-r-- 1 abendezu abendezu    264 Oct 25 18:11 pcount.txt
+-rw-rw-r-- 1 abendezu abendezu 196241 Oct 25 17:42 test.jpg
+total 196
+-rw-rw-r-- 1 abendezu abendezu    396 Oct 25 18:11 pcount.txt
+-rw-rw-r-- 1 abendezu abendezu 196241 Oct 25 17:42 test.jpg
