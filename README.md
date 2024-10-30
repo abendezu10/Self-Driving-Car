@@ -9,6 +9,6 @@ An autonomous vehicle built on a **Raspberry Pi 4** (considering a switch to Ras
 
 ## Tech Stack
 - **Hardware**: Raspberry Pi 4 (or Raspberry Pi Zero), FPGA
-- **Operating System**: Embedded Linux (Yocto Project)
+- **Operating System**: Embedded Linux (Yocto Project), ROS2
 - **Programming Languages**: Bash, C++, Python, C, Verilog
 - **Software**: OpenCV for image processing
