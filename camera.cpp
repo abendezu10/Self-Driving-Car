@@ -36,7 +36,7 @@ int main ()
 
   while(running){
 
-
+    
     fname = "pictures/image" + to_string(img_count) + ".jpg";
     
      if(img_count == 10){
