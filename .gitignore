@@ -1,0 +1,6 @@
+# DS_Store Files
+.DS_Store
+
+
+# Pyhton Files
+__pycache__/
