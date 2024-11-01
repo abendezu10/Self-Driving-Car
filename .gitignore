@@ -4,3 +4,10 @@
 
 # Pyhton Files
 __pycache__
+final.py
+
+# CSS Files
+styles
+templates
+
+
